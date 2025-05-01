@@ -33,7 +33,6 @@ decorator
 dill
 distro
 dotenv
-en-core-web-lg
 executing
 faiss-cpu
 fastapi
@@ -105,9 +104,6 @@ MarkupSafe
 marshmallow
 matplotlib-inline
 mdurl
-mkl_fft
-mkl_random
-mkl-service
 ml_dtypes
 more-itertools
 mpmath
@@ -161,7 +157,6 @@ python-dotenv
 python-Levenshtein
 python-multipart
 pytz
-pywin32
 PyYAML
 pyzmq
 qdrant-client
