@@ -1,0 +1,508 @@
+import pandas as pd
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+import os
+from langchain.agents import initialize_agent, load_tools
+from langchain.chains.llm import LLMChain
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.docstore.document import Document
+from langchain.chains.summarize import load_summarize_chain
+from openai import OpenAI
+from langchain.embeddings import SentenceTransformerEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chains import RetrievalQA
+import re
+import base64
+from email.message import EmailMessage
+import os.path
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from rapidfuzz import fuzz, process
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+load_dotenv('nik_folder/.env')
+# Set the model name for our LLMs.
+OPENAI_MODEL = "gpt-3.5-turbo"
+
+# Store the API key in a variable.
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
+
+sender_email = "znpmeetingassistant@gmail.com"
+sender_password = SENDER_PASSWORD
+sender_password = sender_password.replace('-', ' ')
+smtp_server = "smtp.gmail.com" 
+smtp_port = 587
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+names_dict = {
+    'Terry Stone': "terry.stone@example.com",
+    'Petr Klen': "petr.klen@example.com",
+    'Stephen Pack': "stephen.pack@example.com",
+    'Zain Master': 'zain.master@example.com',
+    'Lukas Kawulok': "lukas.kawulok@example.com",
+    'Radim Moravac': "radim.moravec@example.com",
+    'Petr Nasladek': "petr.nesl@example.com"
+}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+summary_prompt = ChatPromptTemplate.from_messages(
+        [("system", "Write a detailed summary of the following:\\n\\n{text}")]
+    )
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cta_prompt = """You are an intelligent assistant tasked with extracting all unique calls to action from the following text. Return each call to action seperately with a newline character. For example:
+
+-Call to Action 1
+-Call to Action 2
+-Call to Action 3
+...
+
+Here is the text:
+"""
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+identify_names_prompt = """You are a smart and intelligent Named Entity Recognition (NER) system. You will take in a list of possible Names that attended a meeting, and Identify all of the matching names in attendance at the given meeting transcription.
+Importantly, your output should have each name separate with a newline character. For example:
+
+First Name Last Name 1
+First Name Last Name 2
+First Name Last Name 3
+...
+
+Here is the text:
+"""
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cta_names_prompt = """You are a highly accurate Named Entity Recognition (NER) system.  
+Your task is to analyze a meeting transcription along a list of Calls to Action (CTAs) and identify Calls to Action (CTAs) directed at individuals from a provided list of names.
+
+Instructions:
+1. For each name in the list, check if a unique task or action was assigned or implied in the transcription.
+2. If a task exists, return the name followed by the task — all in one line.
+3. If no task exists for a name, return the name followed by: "There were no calls to action directed towards you."
+
+⚠️ Ensure:
+- Every name from the input list is accounted for in the output — no omissions.
+- The output is structured as a clean list: one name per line, followed by the corresponding task or message.
+
+Example Output Format:
+Name 1: Follow up with the client on the pricing details.
+Name 2: Prepare the Q2 financial report.
+Name 3: There were no calls to action directed towards you.
+
+Begin processing now."""
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+email_prompt = """You are an intelligent Email formatting Assistant. You will take in a summary and calls to action from a meeting transcript, as well as a name, with their corresponding specific action and Email address.
+Your task is to write this person an email. Fill in the To: field with their email, output the summary, followed by all calls to actions. Then the corresponding specific action(s) for the member the Email is written for. An example Email Format is as follows:
+
+To: sarah.chen@example.com
+
+From: znpmeetingassistant@gmail.com
+
+Subject: Project Phoenix - Kickoff Meeting Summary
+
+This email summarizes the kickoff meeting for Project Phoenix, held on October 26, 2023.
+
+! Warning ! Assignments of tasks and Summaries generated by this Bot may be innacurate. Please be sure to follow up with Meeting Organizer / Team Lead
+
+Meeting Summary:
+
+The meeting began with an overview of Project Phoenix's objectives: to develop and launch a new customer relationship management (CRM) system within the next six months. We discussed the project's scope, which includes migrating existing customer data, integrating with our current marketing automation platform, and training our sales and support teams on the new system.
+
+Key discussion points included:
+
+- Data Migration Strategy: We reviewed the proposed approach for migrating customer data from the legacy system to the new CRM.
+
+- Integration Requirements: We discussed the necessary integrations with the marketing automation platform, focusing on data synchronization and workflow automation.
+
+- Training Plan: The training team outlined the plan for developing and delivering training materials to sales and support staff.
+
+- Timeline and Milestones: We established the initial project timeline, identifying key milestones and deadlines. A detailed project schedule will be shared next week.
+
+- Budget Allocation: Initial budget was presented.
+
+Calls to Action:
+
+- The following actions were assigned to ensure the project stays on track:
+
+- Sarah Chen: Finalize the data migration plan and submit it for review by November 2nd.
+
+- John Smith: Define the API specifications for the marketing automation platform integration by November 5th.
+
+- Emily Brown: Develop the initial training modules outline by November 9th.
+
+- David Lee: Circulate the detailed project schedule by October 28th.
+
+- Michael Davis: Provide a detailed budget breakdown by November 2nd.
+
+
+Specific Call to Action for Sarah Chen:
+
+Sarah, your immediate action is to finalize the data migration plan, including the specific steps, resources required, and potential risks. Please submit this plan to project_team@example.com by November 2nd.
+
+Thank you for your contributions to the meeting. Please let me know if you have any questions or require further clarification.
+
+Best regards,
+
+ZNP Meeting Assistant*
+
+* ! Warning ! Assignments of tasks and Summaries generated by this Bot may be innacurate. Please be sure to follow up with Meeting Organizer / Team Lead
+
+
+
+Here is the information:
+"""
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def whisper_transcribe(audio_file):
+    client = OpenAI()
+
+    transcription = client.audio.transcriptions.create(
+        file=audio_file,
+        model='whisper-1',
+        response_format='text'
+    )
+    transcription = '"' + transcription['text'] + '"'
+
+    return transcription
+
+
+
+
+def gpt4_summarize(transcription):
+    max_len = 37000
+
+    if len(transcription) >= max_len:
+
+        transcription_list = [transcription[i:i + max_len] for i in range(0, len(transcription), max_len)]
+
+    transcription_list
+
+    #summary bot
+
+    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model_name='gpt-4-turbo', temperature=0)
+
+    # Instantiate chain
+    chain = load_summarize_chain(llm, chain_type="stuff", prompt=summary_prompt)
+
+    # Create Document objects from the filtered transcripts
+    documents = transcription_list
+
+    docs = [Document(page_content=doc) for doc in documents]
+
+
+    # Batching the docs if they're too long
+    def batch_documents(docs, batch_size=1):
+        for i in range(0, len(docs), batch_size):
+            yield docs[i:i + batch_size]
+
+    batch_summaries = []
+    for batch in batch_documents(docs):
+        combined_text = '\n\n'.join([doc.page_content for doc in batch])
+        summary = chain.run(input_documents=batch)
+        batch_summaries.append(summary)
+
+    # summarize all summaries
+    final_input_docs = [Document(page_content=summary) for summary in batch_summaries]
+    final_summary = chain.run(input_documents=final_input_docs)
+
+    return final_summary
+
+
+
+def identify_cta(transcription):
+    client = OpenAI()
+    # Instantiate chain
+    chain3 = client.chat.completions.create(
+        model=OPENAI_MODEL,
+        messages=[{'role': 'system', 'content': cta_prompt},
+                {'role': 'user', 'content': transcription}]
+    )
+
+    ctas = chain3.choices[0].message.content
+
+    return ctas
+
+
+def query_gpt4(transcription, final_summary, ctas, query='What are the key take-aways I should know from this meeting?'):
+
+    meeting_results = {'summary': final_summary, 'action calls': ctas}
+
+    meeting_results['summary'] = 'Summary:\n\n' + meeting_results['summary'] + '\n'
+    meeting_results['action calls'] = ('Calls to Action:\n' + meeting_results['action calls']).replace('\n', '\n\n')
+
+
+    results = [transcription, meeting_results['summary'], meeting_results['action calls']]
+
+    embeddings = SentenceTransformerEmbeddings(model_name='all-mpnet-base-v2')
+
+    docsearch = FAISS.from_texts(
+        texts=results,
+        embedding=embeddings
+    )
+
+    llm3 = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model='gpt-4-turbo', temperature=0)
+
+    qa = RetrievalQA.from_chain_type(
+        llm=llm3,
+        chain_type='stuff',
+        retriever=docsearch.as_retriever(search_kwargs={'k':1}),
+        return_source_documents=False
+    )
+
+    response = qa.invoke(query)
+
+    return f"{query}:\n{response['result'] + '\n'}"
+
+
+
+def identify_names(transcription, names_dict):
+
+    names_dict_list = list(names_dict.keys())
+
+    client = OpenAI()
+    chain3 = client.chat.completions.create(
+    model=OPENAI_MODEL,
+    messages=[{'role': 'system', 'content': identify_names_prompt},
+              {'role': 'user', 'content': f'Names list: {names_dict_list}\n Meeting Transcription {transcription}'}]
+)
+
+    names = chain3.choices[0].message.content
+
+    return names
+
+
+def cta_name_match(transcription, names, ctas):
+
+    names_list = names.split('\n')
+    threshold = 70
+    matched_names = []
+
+    for name in names_dict.keys():
+        match, score, _ = process.extractOne(name, names_list, scorer=fuzz.token_sort_ratio)
+        if score >= threshold:
+            matched_names.append(name)
+
+
+    client = OpenAI()
+    chain3 = client.chat.completions.create(
+    model='gpt-4-turbo',
+    messages=[{'role': 'system', 'content': cta_names_prompt},
+              {'role': 'user', 'content': f"Names: {str(matched_names)}\n Meeting: {transcription}\n Calls to Action {ctas}"}]
+)
+
+    cta_names = chain3.choices[0].message.content
+    cta_names = cta_names.strip('\n\n')
+
+    return cta_names
+
+def generate_emails(names, cta_names, final_summary, ctas):
+
+    names_list = names.split('\n')
+    threshold = 70
+    matched_names = []
+
+    for name in names_dict.keys():
+        match, score, _ = process.extractOne(name, names_list, scorer=fuzz.token_sort_ratio)
+        if score >= threshold:
+            matched_names.append(name)
+
+    filtered_members = {k: v for k, v in names_dict.items() if k in matched_names}
+    members_info = pd.DataFrame({'member': filtered_members.keys(), 'email': filtered_members.values()})
+
+    delimiters = [r": ", "\n"]
+    pattern = "|".join(map(re.escape, delimiters))
+
+    names_calls_list = re.split(pattern, cta_names)
+    
+    meeting_actions = {}
+    i = 0
+    while i < len(names_calls_list) - 1:
+        name = names_calls_list[i].strip()
+        action = names_calls_list[i + 1].strip()
+        meeting_actions[name] = action
+        i += 2
+
+    meeting_actions = pd.DataFrame.from_dict([meeting_actions]).T.reset_index().rename(columns={'index': 'member', 0: 'action'})
+    
+    info = list(members_info['member'].values)
+
+    actions = list(meeting_actions['member'].values)
+
+
+    threshold = 70
+
+    matched_names_actions = []
+
+    for name in info:
+        match, score, _ = process.extractOne(name, actions, scorer=fuzz.token_sort_ratio)
+        if score >= threshold:
+            matched_names_actions.append(name)
+
+    meeting_actions['member'] = matched_names_actions
+
+    meeting_actions_emails = pd.merge(meeting_actions, members_info, on='member', how='outer')
+
+
+    meeting_results = {'summary': final_summary, 'action calls': ctas}
+
+    meeting_results['summary'] = 'Summary:\n\n' + meeting_results['summary'] + '\n'
+    meeting_results['action calls'] = ('Calls to Action:\n' + meeting_results['action calls']).replace('\n', '\n\n')
+
+
+    emails = []
+    for _, row in meeting_actions_emails.iterrows():
+        member_name = row['member']
+        member_email = row['email']
+        specific_action = row['action']
+
+        # Construct the user prompt with the specific information for the member
+        user_prompt = f"""
+        Here is the meeting summary:
+        {meeting_results}
+
+        Here are the calls to action for all members:
+        {meeting_actions_emails.to_string(index=False)}
+
+        Here is the specific call to action for {member_name}:
+        {specific_action}
+        """
+
+        messages = [
+            {'role': 'system', 'content': email_prompt},
+            {'role': 'user', 'content': user_prompt}
+        ]
+
+        client = OpenAI()
+
+        try:
+            chain = client.chat.completions.create(
+                model=OPENAI_MODEL,
+                messages=messages
+            )
+            email_content = chain.choices[0].message.content
+            emails.append(email_content) 
+            print(f"Generated email for {member_name} ({member_email})")
+        except Exception as e:
+            print(f"An error occurred while generating email for {member_name}: {e}")
+            emails.append(f"Error: Could not generate email for {member_name}.")
+
+    
+
+    # Print the list of generated emails
+    print("\n--- Generated Emails ---")
+    for email in emails:
+        print(email)
+
+    return emails
+
+
+def process_and_send_email(emails):
+    email_bones = []
+    for email in emails:
+        lines = email.splitlines()
+        email_bones.append(lines)
+
+    to_list = []
+    for email in email_bones:
+        to_list.append(email[0].replace('To: ', ''))
+
+    sender_list = []
+    for email in email_bones:
+        sender_list.append(email[2].replace('From: ', ''))
+
+    subject_list = []
+    for email in email_bones:
+        subject_list.append(email[4].replace('Subject: ', ''))
+
+    message_text_list = []
+    for email in email_bones:
+        message_text_list.append(str(email[6:]).replace("''", '\n').replace("',", '\n').replace("\n,", '').replace('\n', '\n\n').replace('",', '\n\n').replace('"', '').replace("'", "").replace('[', '\n').replace(']', '\n'))
+
+
+    def create_email(receiver_email, subject, message_text):
+        message = MIMEMultipart()
+        message['From'] = sender_email
+        message['To'] = receiver_email
+        message['Subject'] = subject
+        message.attach(MIMEText(message_text, 'plain'))
+        return message.as_string()
+
+
+
+    def send_email(receiver_email, subject, message_text):
+        message = create_email(receiver_email, subject, message_text)
+
+        try:
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.starttls()
+                server.login(sender_email, sender_password)
+                server.sendmail(sender_email, receiver_email, message)
+            print(f"Email sent successfully to {receiver_email}")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+
+
+    def send_bulk_email(receiver_list, subject_list, message_list):
+        for receiver, subject, message in zip(receiver_list, subject_list, message_list):
+            send_email(receiver, subject, message)
+
+
+    return send_bulk_email(to_list, subject_list, message_text_list)
+
+
+def main(transcription, names_dict):
+    final_summary = gpt4_summarize(transcription)
+
+    ctas = identify_cta(transcription)
+
+    names = identify_names(transcription, names_dict)
+
+    cta_names = cta_name_match(transcription, names, ctas)
+
+    emails = generate_emails(names, cta_names, final_summary, ctas)
+
+    return process_and_send_email(emails)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
