@@ -243,20 +243,12 @@ def identify_cta(transcription):
     return ctas
 
 
-def query_gpt4(transcription, final_summary, ctas, query='What are the key take-aways I should know from this meeting?'):
-
-    meeting_results = {'summary': final_summary, 'action calls': ctas}
-
-    meeting_results['summary'] = 'Summary:\n\n' + meeting_results['summary'] + '\n'
-    meeting_results['action calls'] = ('Calls to Action:\n' + meeting_results['action calls']).replace('\n', '\n\n')
-
-
-    results = [transcription, meeting_results['summary'], meeting_results['action calls']]
+def query_gpt4(transcription, query='What are the key take-aways I should know from this meeting?'):
 
     embeddings = SentenceTransformerEmbeddings(model_name='all-mpnet-base-v2')
 
     docsearch = FAISS.from_texts(
-        texts=results,
+        texts=transcription,
         embedding=embeddings
     )
 
