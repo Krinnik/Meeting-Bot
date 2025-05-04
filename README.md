@@ -117,52 +117,35 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
 - (Also See [Data Sources](#data-sources))  
 1. Public Meetings:  
     - Initial assessment conducted to understand the data and identify any issues
-        - Read in each year from 2013-2024 and convert to a new DataFrame
-        - Combined into Moon Phase DataFrame to be used for analysis 
-        ![moon_data_export](Resources\combined_moon_data.png)
+        - Read in meetings from the dataset that included full notes and summaries
       
 2. Zain's Meeting Notes:
-    - Initial assess
+    - Actual meeting notes (NOT Included in the resources as they were only used for testing the evaluator: Bleu, ROUGE, Tokens)
+    - Additional formatted examples were also include to test the solutions transcribe capabilities (video/ audio > text)
+    - Multiple Meeting notes that were hand written by a human for summarizer evaluation
 
 
 ## Data Analysis
-- GOAL: Determine if there is a statistically significant correlation between moon phases and crime rates in sampled metropolitan areas (Chicago, Houston, Austin, Denver, Los Angeles, and Traffic in Baltimore)).
-- Identify any specific crime types that may be more strongly influenced by the lunar cycle. Explore potential explanations for any observed correlations (e.g., increased visibility during full moon).
+- GOAL: Have the bot properly transcribe meeting notes, create a summary *(high accuracy, precision and recall)*, extract action items, assign a task estimate to them, and lastly send the summary and action items out to relevant users. 
 
-- Aggregation Example:  
-![crime_count](Resources\crime_count.png)
-- Comparison:  
-![comparison_example](Resources/los_angeles_comparison.png)
 
 ## Visualizations  
 
-- Plot of Los Angeles Crime Data by Day,
-  Sliced data for 2020-2024
-![la_plot](Resources/los_angeles_crime_plot.png)
-
-- Full Moon Normalized
-![Full Moon Normalized](Resources/full_moon_normalized.png)
-
-- Full Moon Traffic Normalized
-![Traffic Normalized](Resources/full_moon_traffic_plot.png)
-
-- Outlier Crime Data
-![outlier_crime_data](Resources/los_angeles_crime_outlier.png)
-![outlier_example](Resources/outlier_query.png)
-
-
-
-## Identify Correlation
-No obvious statistical pattern identified.  Mean, Ratios, Statistical, Confidence Interval analyses all indicate a LOW to NO relationship between Erratic Behaviors (Crime & Traffic incidents) and Moon Phases.  Null Hypothesis proved:
-Full Moon Crimes / Divided by / Other Moon Phase Crime rates found distinct tendencies towards ‘1.0.’  This indicates there is a LOW correlation in four of the five city/Moon phase datasets (and in the traffic/Moon phase dataset). Permutation tests indicate a 33% chance of erratic incidents when Moon phases are compared.
+- Plot of Token Count/ Compression Ratio,
+![la_plot](Resources/Token Count_Compression Ratio.png)
  
 
+## Summarizer Evaluation: 
+We wanted to ensure that SumAction’s summarizer was up to the task. While the prompts get all the spotlight, as we know the outputs are generated based on the level of detail and clarity provided, we wanted to evaluate how good our summary was. Measuring the performance of text generation tasks like summarization or translation is not as straightforward. Applying some sort of exact match between the generated summary and the label is not a good solution — even humans would fare poorly under such a metric, because we all have our own writing style. One of the most commonly used metrics for summarization is the **ROUGE score** *(short for Recall-Oriented Understudy for Gisting Evaluation)* or **BLEU** *(bilingual evaluation understudy)*.
 
-## Findings 
-Outside of Denver, CO crime data displayed a hint of a relation (still not strong enough), the majority of our data results proved our H0, or Null, Hypothesis to be proven, i.e. NO RELATIONSHIP EXISTs between Full Moon and Erratic behavior. 
-Multiple realtionship measurements were applied (Mean, Ratios, Statistical Significance, CI, P-value) across the dataset and each confirmed Full Moon days are just like any other moon days and do NOT dramatically influence or cause erratic behavior.  In this investigation, there was no significant correlation between in crime or automobile traffic incidents.
+- ***Bleu measures precision:*** how much the words (and/or n-grams) in the machine generated summaries appeared in the human reference summaries. 
+- ***Rouge measures recall:*** how much the words (and/or n-grams) in the human reference summaries appeared in the machine generated summaries.
 
-While at the higher level the Null Hypothesis proved, our disappointment was used as fuel to investigate deeper to see if any micro-influeces (eg. Type of Crime) were present. This is where we found it quite interesting to see that Murder Rate in Denver, CO was a little bit higher (2% increase) on Full Moon days vs. Other moon days.  Another interesting trend was a marked increase in Tresspassing violations during Full moon phases. 
+The methods essentially compare a generated summary against a set of reference summaries that are typically created by humans. 
+
+***Tokens:*** We also looked at the Token Count / Compression ratios as they reveal how efficiently a summarization model reduces the original text while preserving its meaning. Token count indicates the number of word fragments (tokens) in a piece of text, while compression ratio measures the reduction in token count between the original text and its summary. 
+
+Long story short, SumAction is doing a good enough job to summarize meeting notes and call out learnings. NOTE: We also compared how our models output compared to that of another models output and can see a lot more similarity in recall and precision scoring … which kinda points to that the models are converging closer to each other Or despite being named differently, they had a similar training set
 
 ## Lessons Learned
 Obtaining Data that is accurate and reliable early on is important.  Authoratative public data can hold interesting patterns.  Data can have irregularities and data needs to be normalized.  Different types of statistical analyses, graphing and plotting reveal interesting patterns within the data.  Processing data files takes time and diligence to normalize as there are time zone, UTC and formatting issues to overcome.  Communicatiing roles and responsibilities with expected deliverable dates will help on future projects to best utilize resources.  Version control and using github can be a challenge; the .DSstore file from the Apple IOS proved to be problematic and 'dot ignore' file is mandatory at this level of programming.  
