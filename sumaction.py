@@ -1,3 +1,4 @@
+import streamlit as st
 import pandas as pd
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
@@ -21,54 +22,27 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 from rapidfuzz import fuzz, process
+import tempfile
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 load_dotenv('nik_folder/.env')
-# Set the model name for our LLMs.
-OPENAI_MODEL = "gpt-3.5-turbo"
-
-# Store the API key in a variable.
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
+OPENAI_MODEL = 'gpt-3.5-turbo'
 SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
-
 sender_email = "znpmeetingassistant@gmail.com"
-sender_password = SENDER_PASSWORD
-sender_password = sender_password.replace('-', ' ')
-smtp_server = "smtp.gmail.com" 
+sender_password = SENDER_PASSWORD.replace('-', ' ')
+smtp_server = "smtp.gmail.com"
 smtp_port = 587
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-'''names_dict = {
-    "Petr Nesladek": "petr.nesladek@example.com",
-    "Petr Klen": "petr.klen@example.com",
-    "Terry Stone": "terry.stone@example.com",
-    "Radim Moravec": "radim.moravec@example.com",
-    "Lukas Kawulok": "lukas.kawulok@example.com",
-    "Rene Gruszkowski": "rene.gruszkowski@example.com",
-    "Stephen Pack": "stephen.pack@example.com",
-    "Gloria Kee": "gloria.kee@example.com",
-    "Jiri Sverepa": "jiri.sverepa@example.com",
-    "Chintan Modha": "chintan.modha@example.com",
-    "Petr Lofferman": "petr.lofferman@example.com"
-}'''
 
 capacity = pd.read_csv('Resources/CommonTasks.csv')
-
 capacity1 = capacity[['Common Tasks Types', 'Average Task duration in minutes']]
 list_capacity = capacity1.values.tolist()
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 summary_prompt = ChatPromptTemplate.from_messages(
-        [("system", "Write a detailed summary of the following:\\n\\n{text}")]
-    )
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [("system", "Write a detailed summary of the following:\\n\\n{text}")]
+)
 
 cta_prompt = """You are an intelligent assistant tasked with extracting all unique calls to action from the following text. Return each call to action seperately with a newline character. For example:
 
@@ -79,8 +53,6 @@ cta_prompt = """You are an intelligent assistant tasked with extracting all uniq
 
 Here is the text:
 """
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 identify_names_prompt = """You are a smart and intelligent Named Entity Recognition (NER) system. You will take in a list of possible Names that attended a meeting, and Identify all of the unique matching names that appear in the given meeting transcription.
 Importantly, your output should have each name separate with a newline character. For example:
@@ -93,9 +65,7 @@ First Name Last Name 3
 Here is the text:
 """
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-cta_names_prompt = """You are a highly accurate Named Entity Recognition (NER) system.  
+cta_names_prompt = """You are a highly accurate Named Entity Recognition (NER) system.
 Your task is to analyze a meeting transcription along a list of Calls to Action (CTAs) and identify Calls to Action (CTAs) directed at individuals from a provided list of names.
 
 Instructions:
@@ -114,9 +84,6 @@ Name 3: There were no calls to action directed towards you.
 
 Begin processing now."""
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# Bot to assign a value (hours / weights) to the action items identified from the meeting transcription
 cta_time_prompt = """You are a smart and intelligent project manager that understand how much time it could take on average to complete an action item.
 You will take in a meeting transcript, and a table of common tasks and their estimated completion time in minutes.
 Based on all of the action items/calls from the uploaded meeting transcript, you will reference the table of common tasks and assign an approximate time value in minutes.
@@ -131,8 +98,6 @@ Task 2: (# Mins)
 Task 3: (# Mins)
 Task X: (Unable to estimate).
 """
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 email_prompt = """You are an intelligent Email formatting Assistant. You will take in a summary and calls to action from a meeting transcript, as well as a name, with their corresponding specific action and Email address.
 Your task is to write this person an email. Fill in the To: field with their email, output the summary, followed by all calls to actions. Then the corresponding specific action(s) for the member the Email is written for. An example Email Format is as follows:
@@ -195,162 +160,98 @@ ZNP Meeting Assistant*
 Here is the information:
 """
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 def whisper_transcribe(audio_file):
     client = OpenAI()
-
-    transcription = client.audio.transcriptions.create(
-        file=audio_file,
-        model='whisper-1',
-        response_format='text'
-    )
-    transcription = '"' + transcription['text'] + '"'
-
-    return transcription
-
-
-
+    with open(audio_file, "rb") as audio_data:
+        transcription = client.audio.transcriptions.create(
+            file=audio_data,
+            model='whisper-1',
+            response_format='text'
+        )
+    return f'"{transcription}"'
 
 def gpt4_summarize(transcription):
     max_len = 37000
-
     if len(transcription) >= max_len:
-
         transcription_list = [transcription[i:i + max_len] for i in range(0, len(transcription), max_len)]
-
-    transcription_list
-
-    #summary bot
+    else:
+        transcription_list = [transcription]
 
     llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model_name='gpt-4-turbo', temperature=0)
-
-    # Instantiate chain
     chain = load_summarize_chain(llm, chain_type="stuff", prompt=summary_prompt)
-
-    # Create Document objects from the filtered transcripts
-    documents = transcription_list
-
-    docs = [Document(page_content=doc) for doc in documents]
-
-
-    # Batching the docs if they're too long
-    def batch_documents(docs, batch_size=1):
-        for i in range(0, len(docs), batch_size):
-            yield docs[i:i + batch_size]
-
-    batch_summaries = []
-    for batch in batch_documents(docs):
-        combined_text = '\n\n'.join([doc.page_content for doc in batch])
-        summary = chain.run(input_documents=batch)
-        batch_summaries.append(summary)
-
-    # summarize all summaries
-    final_input_docs = [Document(page_content=summary) for summary in batch_summaries]
-    final_summary = chain.run(input_documents=final_input_docs)
-
+    documents = [Document(page_content=doc) for doc in transcription_list]
+    final_summary = chain.run(documents)
     return final_summary
-
-
 
 def identify_cta(transcription):
     client = OpenAI()
-    # Instantiate chain
     chain3 = client.chat.completions.create(
         model=OPENAI_MODEL,
         messages=[{'role': 'system', 'content': cta_prompt},
-                {'role': 'user', 'content': transcription}]
+                  {'role': 'user', 'content': transcription}]
     )
-
     ctas = chain3.choices[0].message.content
-
     return ctas
 
-
 def query_gpt4(transcription, query='What are the key take-aways I should know from this meeting?'):
-
     embeddings = SentenceTransformerEmbeddings(model_name='all-mpnet-base-v2')
-
     docsearch = FAISS.from_texts(
-        texts=transcription,
+        texts=[transcription],
         embedding=embeddings
     )
-
     llm3 = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model='gpt-4-turbo', temperature=0)
-
     qa = RetrievalQA.from_chain_type(
         llm=llm3,
         chain_type='stuff',
-        retriever=docsearch.as_retriever(search_kwargs={'k':1}),
+        retriever=docsearch.as_retriever(search_kwargs={'k': 1}),
         return_source_documents=False
     )
-
     response = qa.invoke(query)
-
-    return f"{query}:\n{response['result'] + '\n'}"
-
+    return f"{query}:\n{response['result']}\n"
 
 def cta_times(ctas):
-
     client = OpenAI()
     chain3 = client.chat.completions.create(
     model='gpt-4-turbo',
     messages=[{'role': 'system', 'content': cta_time_prompt},
               {'role': 'system', 'content': f"Task 1: {str(ctas)}\n Duration: {str(list_capacity)}\n"}]
 )
-
-    ctas = chain3.choices[0].message.content
-    ctas = ctas.strip('\n\n')
-    return ctas
-
+    cta_times_output = chain3.choices[0].message.content
+    return cta_times_output.strip('\n\n')
 
 def identify_names(transcription, names_dict):
-
     names_dict_list = list(names_dict.keys())
-
     client = OpenAI()
     chain3 = client.chat.completions.create(
-    model=OPENAI_MODEL,
-    messages=[{'role': 'system', 'content': identify_names_prompt},
-              {'role': 'user', 'content': f'Names list: {names_dict_list}\n Meeting Transcription {transcription}'}]
-)
-
+        model=OPENAI_MODEL,
+        messages=[{'role': 'system', 'content': identify_names_prompt},
+                  {'role': 'user', 'content': f'Names list: {names_dict_list}\n Meeting Transcription {transcription}'}]
+    )
     names = chain3.choices[0].message.content
-
     return names
 
-
 def cta_name_match(transcription, names, ctas, names_dict):
-
     names_list = names.split('\n')
     threshold = 70
     matched_names = []
-
     for name in names_dict.keys():
         match, score, _ = process.extractOne(name, names_list, scorer=fuzz.token_sort_ratio)
         if score >= threshold:
             matched_names.append(name)
 
-
     client = OpenAI()
     chain3 = client.chat.completions.create(
-    model='gpt-4-turbo',
-    messages=[{'role': 'system', 'content': cta_names_prompt},
-              {'role': 'user', 'content': f"Names: {str(matched_names)}\n Meeting: {transcription}\n Calls to Action {ctas}"}]
-)
-
-    cta_names = chain3.choices[0].message.content
-    cta_names = cta_names.strip('\n\n')
-
-    return cta_names
+        model='gpt-4-turbo',
+        messages=[{'role': 'system', 'content': cta_names_prompt},
+                  {'role': 'user', 'content': f"Names: {str(matched_names)}\n Meeting: {transcription}\n Calls to Action {ctas}"}]
+    )
+    cta_names_output = chain3.choices[0].message.content
+    return cta_names_output.strip('\n\n')
 
 def generate_emails(names, cta_names, final_summary, ctas, names_dict):
-
     names_list = names.split('\n')
     threshold = 70
     matched_names = []
-
     for name in names_dict.keys():
         match, score, _ = process.extractOne(name, names_list, scorer=fuzz.token_sort_ratio)
         if score >= threshold:
@@ -361,9 +262,8 @@ def generate_emails(names, cta_names, final_summary, ctas, names_dict):
 
     delimiters = [r": ", "\n"]
     pattern = "|".join(map(re.escape, delimiters))
-
     names_calls_list = re.split(pattern, cta_names)
-    
+
     meeting_actions = {}
     i = 0
     while i < len(names_calls_list) - 1:
@@ -373,31 +273,22 @@ def generate_emails(names, cta_names, final_summary, ctas, names_dict):
         i += 2
 
     meeting_actions = pd.DataFrame.from_dict([meeting_actions]).T.reset_index().rename(columns={'index': 'member', 0: 'action'})
-    
-    info = list(members_info['member'].values)
 
+    info = list(members_info['member'].values)
     actions = list(meeting_actions['member'].values)
 
-
-    threshold = 70
-
     matched_names_actions = []
-
     for name in info:
         match, score, _ = process.extractOne(name, actions, scorer=fuzz.token_sort_ratio)
         if score >= threshold:
             matched_names_actions.append(name)
 
     meeting_actions['member'] = matched_names_actions
-
     meeting_actions_emails = pd.merge(meeting_actions, members_info, on='member', how='outer')
 
-
     meeting_results = {'summary': final_summary, 'action calls': ctas}
-
     meeting_results['summary'] = 'Summary:\n\n' + meeting_results['summary'] + '\n'
     meeting_results['action calls'] = ('Calls to Action:\n' + meeting_results['action calls']).replace('\n', '\n\n')
-
 
     emails = []
     for _, row in meeting_actions_emails.iterrows():
@@ -405,7 +296,6 @@ def generate_emails(names, cta_names, final_summary, ctas, names_dict):
         member_email = row['email']
         specific_action = row['action']
 
-        # Construct the user prompt with the specific information for the member
         user_prompt = f"""
         Here is the meeting summary:
         {meeting_results}
@@ -430,15 +320,12 @@ def generate_emails(names, cta_names, final_summary, ctas, names_dict):
                 messages=messages
             )
             email_content = chain.choices[0].message.content
-            emails.append(email_content) 
+            emails.append(email_content)
             print(f"Generated email for {member_name} ({member_email})")
         except Exception as e:
             print(f"An error occurred while generating email for {member_name}: {e}")
             emails.append(f"Error: Could not generate email for {member_name}.")
 
-    
-
-    # Print the list of generated emails
     print("\n--- Generated Emails ---")
     for email in emails:
         print(email)
@@ -468,7 +355,6 @@ def process_and_send_email(emails):
     for email in email_bones:
         message_text_list.append(str(email[6:]).replace("''", '\n').replace("',", '\n').replace("\n,", '').replace('\n', '\n\n').replace('",', '\n\n').replace('"', '').replace("'", "").replace('[', '\n').replace(']', '\n'))
 
-
     def create_email(receiver_email, subject, message_text):
         message = MIMEMultipart()
         message['From'] = sender_email
@@ -477,64 +363,97 @@ def process_and_send_email(emails):
         message.attach(MIMEText(message_text, 'plain'))
         return message.as_string()
 
-
-
     def send_email(receiver_email, subject, message_text):
         message = create_email(receiver_email, subject, message_text)
-
         try:
             with smtplib.SMTP(smtp_server, smtp_port) as server:
                 server.starttls()
                 server.login(sender_email, sender_password)
                 server.sendmail(sender_email, receiver_email, message)
+            st.success(f"Email sent successfully to {receiver_email}")
             print(f"Email sent successfully to {receiver_email}")
         except Exception as e:
+            st.error(f"Error sending email to {receiver_email}: {e}")
             print(f"Error sending email: {e}")
-
 
     def send_bulk_email(receiver_list, subject_list, message_list):
         for receiver, subject, message in zip(receiver_list, subject_list, message_list):
             send_email(receiver, subject, message)
 
-
     return send_bulk_email(to_list, subject_list, message_text_list)
-
 
 def main(transcription, names_dict):
     final_summary = gpt4_summarize(transcription)
-
     ctas = identify_cta(transcription)
-
-    ctas = cta_times(ctas)
-
+    ctas_with_times = cta_times(ctas)
     names = identify_names(transcription, names_dict)
-
     cta_names = cta_name_match(transcription, names, ctas, names_dict)
+    emails = generate_emails(names, cta_names, final_summary, ctas_with_times, names_dict)
+    process_and_send_email(emails)
 
-    emails = generate_emails(names, cta_names, final_summary, ctas, names_dict)
+MAX_FILE_SIZE_MB = 25
+MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
-    return process_and_send_email(emails)
+# Streamlit App
+st.title("SumAction")
 
+st.subheader("1. Enter Meeting Participants:")
+members_dict_str = st.text_area("Enter participant names and emails as a Python dictionary (e.g., {'Name': 'email@example.com', ...})")
 
+st.subheader("2. Upload Meeting File:")
+meeting_file = st.file_uploader(f"Upload MP3 or TXT file (Maximum file size: {MAX_FILE_SIZE_MB} MB)", type=["mp3", "txt"])
 
+st.subheader("Ask a Question about the Meeting (Optional):")
+query = st.text_input("Your question:")
+query_button = st.button("Ask")
 
+if query_button and meeting_file:
+    if meeting_file.size > MAX_FILE_SIZE_BYTES:
+        st.error(f"File size exceeds the maximum allowed size of {MAX_FILE_SIZE_MB}MB. Please upload a smaller file.")
+        meeting_file = None
+    elif meeting_file.type == "text/plain":
+        transcript = meeting_file.read().decode("utf-8")
+        query_response = query_gpt4(transcript, query)
+        st.info(query_response)
+    elif meeting_file.type == "audio/mpeg":
+        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+            tmp_file.write(meeting_file.read())
+            audio_path = tmp_file.name
+        transcript = whisper_transcribe(audio_path)
+        os.remove(audio_path)
+        query_response = query_gpt4(transcript, query)
+        st.info(query_response)
+    else:
+        st.error("Unsupported file type for querying.")
+elif query_button and not meeting_file:
+    st.warning("Please upload a meeting file to ask a question.")
 
+st.subheader("Process Meeting and Send Emails:")
+process_button = st.button("Process Meeting and Send Emails")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if process_button and members_dict_str and meeting_file:
+    try:
+        names_dict = eval(members_dict_str)
+        if not isinstance(names_dict, dict):
+            st.error("Invalid format for participants dictionary.")
+        else:
+            with st.spinner("Processing meeting and generating emails..."):
+                if meeting_file.type == "text/plain":
+                    transcript = meeting_file.read().decode("utf-8")
+                    main(transcript, names_dict)
+                elif meeting_file.type == "audio/mpeg":
+                    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                        tmp_file.write(meeting_file.read())
+                        audio_path = tmp_file.name
+                    transcript = whisper_transcribe(audio_path)
+                    os.remove(audio_path)
+                    main(transcript, names_dict)
+                else:
+                    st.error("Unsupported file type for processing.")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+elif process_button:
+    if not members_dict_str:
+        st.warning("Please enter the meeting participants.")
+    if not meeting_file:
+        st.warning("Please upload a meeting file.")
