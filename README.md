@@ -28,19 +28,43 @@ We leveraged OpenAI, its LLMs, and engineered prompts that were effective in cre
 - [Presentation](#presentation)
 
 ## Project Overview  
-  
-The Lunar Madness project Team is investigating the urban legend that correlates erratic behavior when the moon is in its Full phase. By comparing moon phase data against reported crime and traffic data for multiple major metropolitan cities, the project seeks to determine if there is a statistically significant correlation. If a strong correlation is identified, this preliminay proof of concept could be used as a basis for future investigation.  Businesses and municipalities could benefit from the investigative work of the Lunar Madness Team to help inform optimized staffing levels, fleet preparations, and advising on supply inventories for public departments such as law enforcement, emergency services, and hospitals during specific lunar phases.
+We Americans love our meetings! We often find ourselves spending a significant portion of our waking hours in back-to-back meetings. Research indicates that professionals spend an average of 20-25 hours every week in meetings. Furthermore, individuals spend an additional 30-45 minutes on post-meeting activities, including compiling notes, action items, and follow-up tasks. This becomes even more challenging in today's fast-paced work environment, where many of us transition seamlessly from one meeting to the next. The constant context switching and information overload can lead to decreased productivity, increased stress, and a struggle to effectively manage workloads.
 
-## Hypothesis
-In research, there are two types of hypotheses: null (H0) and alternative (Ha). They work as a complementary pair, each stating that the other is wrong.
+Our team is developing an innovative solution that leverages the power of Large Language Models (LLMs) and intelligent bots to dramatically increase meeting productivity. We aim to address these challenges by creating a suite of tools that automate critical meeting-related tasks, allowing professionals to focus on higher-value activities. 
 
-- *Null Hypothesis (H0)* – This can be thought of as the implied hypothesis. “Null” meaning “nothing.”  This hypothesis states that there is no difference between groups or no relationship between variables. The null hypothesis is a presumption of status quo or no change. In our case, H0 = The full moon does not influence behavior, full moon or other moon days will approximately display the same level of erratic behavior.
+Our solution offers the following key features:
 
-- *Alternative Hypothesis (Ha)* – This hypothesis should state what we expect the data to show, based on our research on the topic. This is also known as the claim and in our case, Ha = Full moon days will have a higher number of erratic behavior incidents in comparision to other moon days.
+1. Automated Summarization: Our bot automatically generates concise and accurate summaries of meeting discussions, capturing key points and decisions. This eliminates the need for manual note-taking and ensures that all participants have a clear record of what was discussed.
 
-Erratic behavior is defined as "unpredictable, irregular, or inconsistent behavior that deviates from what is considered normal. It wan include mood swings, impulsive actions, and exaggerated emotional responses. Crime data and traffic violations datasets were used in our case as close analogies to represent erratic behavior. 
+1. Action Item Tracking and Assignment: The bot intelligently identifies and extracts action items from meeting conversations, automatically assigning them to responsible parties. This ensures clear accountability and prevents action items from falling through the cracks.
 
-The Lunar Madness team sought to test the validity of the lunar lunacy effect by comparing crime data against full moon dates in 4 major metropolitan cities (Austin, Denver, Houston and Los Angeles) and traffic viloation across the entire the state of Maryland. If our hypothesis is true, we should see a higher volume of erratic behavior incidents, crime and traffic viloations, on days with a full moon.
+1. Automated Distribution: Summarized notes and assigned action items are automatically distributed via email to relevant participants, streamlining communication and ensuring that everyone stays informed.
+
+1. Action Item Effort Estimation: *(Key Differentiator)* Unlike existing solutions, our bot goes beyond simple action item tracking. It leverages LLMs to provide effort estimates for assigned action items. This unique feature enables users to:
+
+1. Improve Project Planning: Accurately estimate the time required for each task, facilitating more effective project planning and resource allocation.
+
+1. Optimize Scheduling: Better manage individual workloads and schedules by understanding the effort involved in completing assigned tasks.
+
+1. Proactively Manage Delays: Identify potential bottlenecks or scheduling conflicts early on, allowing for proactive mitigation and ensuring timely deliverable completion.
+
+1. Aggregated Action Item Management: *(Key Differentiator)* Our solution also gathers and consolidates all action items assigned to individual users across all their meetings within a given day. This provides a comprehensive overview of daily responsibilities, enabling users to:
+
+1. Prioritize Tasks Effectively: Gain a holistic view of their workload, allowing them to prioritize tasks based on urgency and importance.
+
+1. Optimize Daily Workflow: Plan their workday more efficiently by understanding the full scope of their commitments.
+
+1. Enhance Time Management: Proactively manage their time and avoid feeling overwhelmed by fragmented action items spread across multiple meetings.
+
+1. Contextual Query Bot: We have also developed a query bot that allows users to quickly retrieve specific information from past meetings. This bot enhances recall and facilitates efficient context gathering, enabling users to:
+
+1. Quickly Find Information: Avoid spending valuable time searching through lengthy meeting transcripts or notes.
+
+1. Improve Decision Making: Access relevant historical information to make more informed decisions.
+
+1. Onboard New Team Members: Quickly bring new team members up to speed by providing them with easy access to past meeting discussions.
+
+By automating these time-consuming and often tedious tasks, our AI-powered meeting bot empowers professionals to reclaim valuable time, reduce stress, and focus on the substantive aspects of their work.
 
 ## Project Requirements
 Please review the 'requirements.txt' file in the Resources folder to get a complete overview of the entire set of libraries that are needed to run the program.
