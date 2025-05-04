@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <!-- Background Circle -->
+  <circle cx="250" cy="250" r="240" fill="#f0f9ff" stroke="#3b82f6" stroke-width="8"/>
+  
+  <!-- Brain Circuit Pattern -->
+  <g fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round">
+    <path d="M150,140 C180,120 220,120 250,140 C280,160 320,160 350,140" />
+    <path d="M120,180 C160,160 200,160 240,180 C280,200 320,200 360,180" />
+    <path d="M110,220 C150,200 190,200 230,220 C270,240 310,240 370,220" />
+    <circle cx="150" cy="140" r="6" fill="#3b82f6" />
+    <circle cx="250" cy="140" r="6" fill="#3b82f6" />
+    <circle cx="350" cy="140" r="6" fill="#3b82f6" />
+    <circle cx="120" cy="180" r="6" fill="#3b82f6" />
+    <circle cx="240" cy="180" r="6" fill="#3b82f6" />
+    <circle cx="360" cy="180" r="6" fill="#3b82f6" />
+    <circle cx="110" cy="220" r="6" fill="#3b82f6" />
+    <circle cx="230" cy="220" r="6" fill="#3b82f6" />
+    <circle cx="370" cy="220" r="6" fill="#3b82f6" />
+  </g>
+  
+  <!-- Stylized Document/Notepad -->
+  <g transform="translate(170, 170)">
+    <rect x="0" y="0" width="160" height="200" rx="10" ry="10" fill="#ffffff" stroke="#3b82f6" stroke-width="5"/>
+    <line x1="25" y1="40" x2="135" y2="40" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+    <line x1="25" y1="70" x2="135" y2="70" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+    <line x1="25" y1="100" x2="135" y2="100" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+    <line x1="25" y1="130" x2="90" y2="130" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Checkmarks for Tasks -->
+  <g transform="translate(110, 235)">
+    <circle cx="0" cy="0" r="18" fill="#10b981"/>
+    <path d="M-6,0 L-2,4 L6,-4" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <g transform="translate(110, 300)">
+    <circle cx="0" cy="0" r="18" fill="#10b981"/>
+    <path d="M-6,0 L-2,4 L6,-4" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  
+  <!-- Email/Task Arrow -->
+  <g>
+    <path d="M350,250 L390,250 L390,310 L410,310" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="410,300 410,320 430,310" fill="#3b82f6"/>
+    
+    <!-- Email Icon -->
+    <rect x="330" y="290" width="40" height="30" rx="3" ry="3" fill="#ffffff" stroke="#3b82f6" stroke-width="3"/>
+    <path d="M330,295 L350,310 L370,295" fill="none" stroke="#3b82f6" stroke-width="2"/>
+  </g>
+  
+  <!-- Sound Waves (representing voice/meetings) -->
+  <g transform="translate(80, 250)">
+    <path d="M0,30 C10,10 10,50 20,30 C30,10 30,50 40,30" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  
+  <!-- AI Core Element -->
+  <circle cx="250" cy="250" r="40" fill="#3b82f6"/>
+  <circle cx="250" cy="250" r="30" fill="#ffffff"/>
+  <circle cx="250" cy="250" r="20" fill="#3b82f6"/>
+  
+  <!-- Company Name -->
+  <text x="250" y="420" font-family="Arial, sans-serif" font-size="36" font-weight="bold" text-anchor="middle" fill="#3b82f6">SumAction</text>
+  <text x="250" y="450" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#64748b">Smart Meeting Assistant</text>
+</svg>
