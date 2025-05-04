@@ -8,9 +8,9 @@
 
 ## Executive Summary  
 
-The **Lunar Madness** project analyzes potential correlations between full moons and crime rates in five U.S. cities. The goal is to leverage public crime statistics and known lunar data to identify patterns that could help organizations optimize staffing and resource allocations. Target clients include local governments, law enforcement agencies, hospitals, and first responders who could benefit from predictive scheduling based on lunar-correlated incident patterns.
+The **SumAction** AI Productivity tool analyzes your uploaded meeting notes (formats supported: text, video, audio) and uses AI to deliver a concise summary of the meetings, key learnings, along with a list of action items and a estimate of the task. The tool allows you to increase your productivity by taking care of the menial tasks of emailing attendees their specific tasks, giving you the opportunity to be more productive or just a rest from the daily rigmarole.
 
-Unfortunately, the Null hypothesis proved to be true and we were unable to prove our alternate conclusion. 
+We leveraged OpenAI, its LLMs, and engineered prompts that were effective in creating our productivity tool to summarize uploaded meeting notes (Audio, Video, Text) and to extract action items.  
 
 ## Table of Contents  
 
@@ -43,61 +43,63 @@ Erratic behavior is defined as "unpredictable, irregular, or inconsistent behavi
 The Lunar Madness team sought to test the validity of the lunar lunacy effect by comparing crime data against full moon dates in 4 major metropolitan cities (Austin, Denver, Houston and Los Angeles) and traffic viloation across the entire the state of Maryland. If our hypothesis is true, we should see a higher volume of erratic behavior incidents, crime and traffic viloations, on days with a full moon.
 
 ## Project Requirements
-
+Please review the 'requirements.txt' file in the Resources folder to get a complete overview of the entire set of libraries that are needed to run the program.
+Use the single line to run the command within the Jyupter Notebook | [!pip install -r requirements.txt. ]
 - **Software Requirements:**
-  - [Python 3.16 or greater](https://www.python.org/)   
+  - [Python 3.12.9 or greater](https://www.python.org/)   
   - [Jupyter Notebook](https://jupyter.org/)
   - GitHub account   
   - Load Dependancies: 
     ```
+    from langchain_openai import ChatOpenAI
+    from dotenv import load_dotenv
+    import os
+    from langchain.agents import initialize_agent, load_tools
+    from langchain.chains.llm import LLMChain
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain.docstore.document import Document
+    from langchain.chains.summarize import load_summarize_chain
+    from langchain_core.prompts import PromptTemplate
     import pandas as pd
-    from prophet import Prophet
-    import datetime as dt
-    import numpy as np
+    from datasets import load_dataset
+    from openai import OpenAI
+    from rouge import Rouge
+    from rouge_score import rouge_scorer
+    from pprint import pprint
+    import nltk
+    import evaluate
+    import tiktoken
+    from transformers import pipeline
     import matplotlib.pyplot as plt
-    %matplotlib inline 
     ```
 - **GitHub Repository Structure:**
 ``` Markdown for Clean display of GitHub Repository Structure
-  📦Project-1_Lunar_Madness 
-      ┣ 📂Michael (Project Notebooks and CSV working files (Austin, Denver, Chicago, LA & Moon))
-      ┣ 📂Raymond (Practice & Investigative Jupyter, Notes and test files )
-      ┣ 📂Sheila  (Cleand Moon Source file Jupyter Project notebooks, & export CSV) 
-      ┣ 📂Zain (Jupyter Project notebooks for )
-      ┣ 📂Resources (Data Source files and images for project) 
-      ┣ 📜.DS_Store
-      ┣ 📜.gitattributes
+  📦Meeting-Bot 
+      ┣ 📂Nik_folder  (Project Notebooks: Summarizer, Action Extractor, Email Developer / Collector and MailAgent)
+      ┣ 📂Zain_folder (Project Notebooks: Summarizer, Action Extractor, Evaluator, TaskEstimateBot, Q&A Query)
+      ┣ 📂Resources (Meeting recordings, CommonTasks.csv) 
+      ┣ 📜.utils.py
       ┣ 📜.gitignore
-      ┣ 📜Howlers_(Lunar Madness)_Project_Sheet.xlsx
       ┣ 📜LICENSE 
       ┣ 📜README.md 
-      ┗ 📜lunar_madness.png
+      ┗ 📜SumAction.svg
 ```
 - **For Project Files, see:**
-    - /Zain/lunar_Auto.ipynb
-    - /Zain/lunar_Crimes.ipynb  
-    - /Michael/Denver.ipynb
-    - /Michael/Alt_LA.ipynb
-    - /Sheila/Houston_Lunar_Data_Sheila.ipynb
-    - /Sheila/Moon_Data.ipynb
+    - /Zain/Zain_meeting_ai_workspace.ipynb
+    - /Nik/meeting_ai_workspace.ipynb
+
   
 ## Data Collection 
 - (Also See [Data Sources](#data-sources))  
-1. Moon phase data collected from the U.S. Naval Observatory and the National Weather Service.  
+1. Public Meetings:  
     - Initial assessment conducted to understand the data and identify any issues
         - Read in each year from 2013-2024 and convert to a new DataFrame
         - Combined into Moon Phase DataFrame to be used for analysis 
         ![moon_data_export](Resources\combined_moon_data.png)
-2. Crime / Incident data cleaned and normalized for the following cities:  
-    - Austin
-    - Baltimore (Traffic)  
-    - Chicago  
-    - Denver   
-    - Houston  
-    - Los Angeles  
-3. Moon data merged with the crime data for each city  
-Houston Data Sample:
-![houston_moon_combined](Resources/combined_moon_data.png)
+      
+2. Zain's Meeting Notes:
+    - Initial assess
+
 
 ## Data Analysis
 - GOAL: Determine if there is a statistically significant correlation between moon phases and crime rates in sampled metropolitan areas (Chicago, Houston, Austin, Denver, Los Angeles, and Traffic in Baltimore)).
