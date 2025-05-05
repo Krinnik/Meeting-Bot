@@ -15,7 +15,7 @@ from email.mime.multipart import MIMEMultipart
 from rapidfuzz import fuzz, process
 
 
-
+# api and SMTP variables
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 OPENAI_MODEL = 'gpt-3.5-turbo'
 SENDER_PASSWORD = st.secrets["SENDER_PASSWORD"]
@@ -24,12 +24,12 @@ sender_password = SENDER_PASSWORD.replace('-', ' ')
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
 
-
+# cta time training data
 capacity = pd.read_csv('Resources/CommonTasks.csv')
 capacity1 = capacity[['Common Tasks Types', 'Average Task duration in minutes']]
 list_capacity = capacity1.values.tolist()
 
-
+#~~~LLM Prompts~~~#
 summary_prompt = ChatPromptTemplate.from_messages(
     [("system", "Write a detailed summary of the following:\\n\\n{text}")]
 )
@@ -150,6 +150,10 @@ ZNP Meeting Assistant*
 Here is the information:
 """
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+
+# whisper transcribe
 def whisper_transcribe(audio_file):
     client = OpenAI()
     with open(audio_file, "rb") as audio_data:
@@ -160,6 +164,7 @@ def whisper_transcribe(audio_file):
         )
     return f'"{transcription}"'
 
+# summarize LLM
 def gpt4_summarize(transcription):
     max_len = 37000
     if len(transcription) >= max_len:
@@ -173,6 +178,7 @@ def gpt4_summarize(transcription):
     final_summary = chain.run(documents)
     return final_summary
 
+# CTA LLM
 def identify_cta(transcription):
     client = OpenAI()
     chain3 = client.chat.completions.create(
@@ -183,6 +189,7 @@ def identify_cta(transcription):
     ctas = chain3.choices[0].message.content
     return ctas
 
+# query bot LLM
 def query_gpt4(transcription, query='What are the key take-aways I should know from this meeting?'):
     embeddings = SentenceTransformerEmbeddings(model_name='all-mpnet-base-v2')
     docsearch = FAISS.from_texts(
@@ -199,6 +206,7 @@ def query_gpt4(transcription, query='What are the key take-aways I should know f
     response = qa.invoke(query)
     return f"{query}:\n{response['result']}\n"
 
+# cta time identifer LLM
 def cta_times(ctas):
     client = OpenAI()
     chain3 = client.chat.completions.create(
@@ -209,6 +217,7 @@ def cta_times(ctas):
     cta_times_output = chain3.choices[0].message.content
     return cta_times_output.strip('\n\n')
 
+# NER LLM
 def identify_names(transcription, names_dict):
     names_dict_list = list(names_dict.keys())
     client = OpenAI()
@@ -220,6 +229,7 @@ def identify_names(transcription, names_dict):
     names = chain3.choices[0].message.content
     return names
 
+# NER CTA LLM
 def cta_name_match(transcription, names, ctas, names_dict):
     names_list = names.split('\n')
     threshold = 70
@@ -238,6 +248,7 @@ def cta_name_match(transcription, names, ctas, names_dict):
     cta_names_output = chain3.choices[0].message.content
     return cta_names_output.strip('\n\n')
 
+# email gen LLM
 def generate_emails(names, cta_names, final_summary, ctas, names_dict):
     names_list = names.split('\n')
     threshold = 70
@@ -323,6 +334,7 @@ def generate_emails(names, cta_names, final_summary, ctas, names_dict):
     return emails
 
 
+# create and send emails function
 def process_and_send_email(emails):
     email_bones = []
     for email in emails:
@@ -372,6 +384,7 @@ def process_and_send_email(emails):
 
     return send_bulk_email(to_list, subject_list, message_text_list)
 
+# do it all in one go
 def main(transcription, names_dict):
     final_summary = gpt4_summarize(transcription)
     ctas = identify_cta(transcription)

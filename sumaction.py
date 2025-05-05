@@ -3,22 +3,29 @@ import os
 import tempfile
 from sumaction_utils import *
 
+
+# max file size for Whisper
 MAX_FILE_SIZE_MB = 25
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 # Streamlit App
 st.title("SumAction")
 
+# dictionary input field
 st.subheader("1. Enter Meeting Participants:")
 members_dict_str = st.text_area("Enter participant names and emails as a Python dictionary (e.g., {'Name': 'email@example.com', ...})")
 
+# transcript upload field
 st.subheader("2. Upload Meeting File:")
 meeting_file = st.file_uploader(f"Upload MP3 or TXT file (Maximum file size: {MAX_FILE_SIZE_MB} MB)", type=["mp3", "txt"])
 
+# Query input field
 st.subheader("Ask a Question about the Meeting (Optional):")
 query = st.text_input("Your question:")
+# Query input button
 query_button = st.button("Ask")
 
+# Runs query LLM
 if query_button and meeting_file:
     if meeting_file.size > MAX_FILE_SIZE_BYTES:
         st.error(f"File size exceeds the maximum allowed size of {MAX_FILE_SIZE_MB}MB. Please upload a smaller file.")
@@ -40,9 +47,11 @@ if query_button and meeting_file:
 elif query_button and not meeting_file:
     st.warning("Please upload a meeting file to ask a question.")
 
+# Process and send emails button
 st.subheader("Process Meeting and Send Emails:")
 process_button = st.button("Process Meeting and Send Emails")
 
+# Runs processing and sends emails
 if process_button and members_dict_str and meeting_file:
     try:
         names_dict = eval(members_dict_str)
