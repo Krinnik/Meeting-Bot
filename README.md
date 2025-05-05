@@ -8,7 +8,7 @@
 
 ## Executive Summary  
 
-The **SumAction** AI Productivity tool analyzes your uploaded meeting notes (formats supported: text, video, audio) and uses AI to deliver a concise summary of the meetings, key learnings, along with a list of action items and a estimate of the task. The tool allows you to increase your productivity by taking care of the menial tasks of emailing attendees their specific tasks, giving you the opportunity to be more productive or just a rest from the daily rigmarole.
+The **SumAction** AI Meeting Productivity tool analyzes your uploaded meeting notes (formats supported: text, video, audio) and uses AI to deliver a concise summary of the meetings, key learnings, along with a list of action items and a estimate of the task. The tool allows you to increase your productivity by taking care of the menial tasks of emailing attendees their specific tasks, giving you the opportunity to be more productive or just a rest from the daily rigmarole.
 
 We leveraged OpenAI, its LLMs, and engineered prompts that were effective in creating our productivity tool to summarize uploaded meeting notes (Audio, Video, Text) and to extract action items.  
 
@@ -18,7 +18,6 @@ We leveraged OpenAI, its LLMs, and engineered prompts that were effective in cre
   - [Project Requirements](#project-requirements)  
   - [Data Collection](#data-collection)  
   - [Data Analysis](#data-analysis)
-  - [Identify Correlation](#identify-correlation)
 - [Findings](#conclusion)
   - [Statistical Significance](#statistical-significance)
   - [Lessons Learned](#lessons-learned)
@@ -132,7 +131,7 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
 ## Visualizations  
 
 - Plot of Token Count/ Compression Ratio,
-![la_plot](Resources/Token Count_Compression Ratio.png)
+![Token_plot](Resources/Token Count_Compression Ratio.png)
  
 
 ## Summarizer Evaluation: 
@@ -148,62 +147,41 @@ The methods essentially compare a generated summary against a set of reference s
 Long story short, SumAction is doing a good enough job to summarize meeting notes and call out learnings. NOTE: We also compared how our models output compared to that of another models output and can see a lot more similarity in recall and precision scoring … which kinda points to that the models are converging closer to each other Or despite being named differently, they had a similar training set
 
 ## Lessons Learned
-Obtaining Data that is accurate and reliable early on is important.  Authoratative public data can hold interesting patterns.  Data can have irregularities and data needs to be normalized.  Different types of statistical analyses, graphing and plotting reveal interesting patterns within the data.  Processing data files takes time and diligence to normalize as there are time zone, UTC and formatting issues to overcome.  Communicatiing roles and responsibilities with expected deliverable dates will help on future projects to best utilize resources.  Version control and using github can be a challenge; the .DSstore file from the Apple IOS proved to be problematic and 'dot ignore' file is mandatory at this level of programming.  
+----------
+- Prompt engineering is definitely an art! Just changing single words in the prompt can completely change up the response (eg. Using the work 'Unique').
+- LLMs and bot responses are definitely converging (feel the training datasets for LLMs were quite close).
+- Its getting really easy to build applications that can help increase productivity, but at the expense of what traditionally took some cognitive creative thinking 
 
 **Cost Of Project**
 Using the following average Colorado salary scales for team member roles, we were able to calculate the cost of conducting this project. 
-- Data Scientist (1): $104,771 | *(per week cost = $2014.82)*
-- Data Engineer (2): $117,223 | *(per week cost = $2254.29)*
-- Project Manager (1): $93,823 | *(per week cost = $1804.29)* 
 
-Total Internal Cost for Conducting Analysis (2 weeks) = $16,655.38 
+- Software (1): $109,223 | *(per week cost = $2100.44)*
+- Prompt Manager (1): $110,823 | *(per week cost = $2131.21)*
+- Cost per meeting (OpenAI): $0.35
+- App Hosting Cost: $500/month 
 
-Having proven that there isn't a relationship that exists between Full Moons and Erratic Beahvior *(Crime/Traffic Violations)*, we hope to reach out to the **6000** 911 call centers, also known as Public Safety Answering Points [PSAs](https://health.wusf.usf.edu/health-news-florida/2024-07-18/the-nations-911-system-is-on-the-brink-of-its-own-emergency) that may be prone to overstaffing their call centers with additional resources to handle a percieved increase in erratic behavior, especially surrounding full moon days *(3 days: 1 day prior, day of full moon, 1 day after)* that are still percieved by many to be a full moon. 
-
-**Tax Payer Savings**
-Assume we save the need to overstaff just by a single dispatcher across the 3 days of percieved full moons *(3 days: 1 day prior, day of full moon, 1 day after)*  
-- Average call center dispatcher makes [$18/hour](https://www.ziprecruiter.com/Salaries/Customer-Service-Dispatcher-Salary). 
-    - We'd save tax payers around *~$486/person* for a single dispatcher working over the 3 days they plan to overstaff to handle the alledge additional call volume. 
-- There are roughly **6000** [911 call Centers](https://health.wusf.usf.edu/health-news-florida/2024-07-18/the-nations-911-system-is-on-the-brink-of-its-own-emergency) in the US.
-- 36 Alleged Full Moon days (12 actual Full Moons in a year. +/- 1 day surrounding the full moon)
-- Savings of even 1 staff member across 36 Full Moon Days in a Year across 6000 PSAs could save the tax payers =  *$34,992,000*     *(12 x $486 x 6000 locations)*
+Total Cost Creating App (2 weeks) = $8463.30 
   
 
-## Next Steps:
-If a organization, public or private, are willing to sponsor and provide authoratative raw data on local crime, traffic, 911, Emergency rooms and other first responder data, the Lunar Madness Team ("LM") could be contracted to combine the data and further refine this proof of concept template.  The LM framework includes moon phase data, and has several models to plug in local and regional data to uncover statistical correlations.  The Lunar Madness team will scour the data for high correlation events such as crime with other local events or phenomena, research is not limited to just moon phase data.  Set our team to the task of investigating revenue patterns, custom projects, or explore for unidentified trends.  Correlated information that leads to efficient management and can be predicted can make the difference between success vs. surviving.  Let us know the problem you wish to solve and we will do the analysys and presentation for you and your organization.
+## Next Steps:-----------
+The application developed can be used by anyone wanting to better manage, plan, and prioritize their work. While the application is currently usable and can be marketed, we'd still like to:
+- Half the number of calls to OpenAI (2 summarizer + 2 assignment calls)
+- Create Calendar events w/ assignments # of days prior to assignment being due
+- Coalesce all events for user and help them understand ALL of their end-of-day assignments
+- Build in prioritization and memory so that user can query system to better plan deliverables for the upcoming work week. 
+
 
 ## Appendix
 ## Data Sources:
-### Full Moon Data Sources:
-- [National Weather Service](https://www.weather.gov/box/sunmoon)
- (National Oceanic and Atmospheric Administration)  
-Data Points:  Daily moon phase information (e.g., new moon, full moon, first quarter, last quarter, percentage of illumination)  
+### Meeting Data Sources:
+- [Public Meetings](https://github.com/pltrdy/public_meetings)
+This corpus contains meetings, made of pairs of (a) automatic transcriptions from audio recordings, (b) meeting reports written by a professional.
 
-- [US Naval Observatory Moon Phases](https://aa.usno.navy.mil/calculated/moon/phases?date=2024-01-10&nump=50&format=t&submit=Get+Data)  
-Data Points:  Daily moon phase information (e.g., new moon, full moon, first quarter, last quarter)   
+- [59+ Meeting statistics](https://www.crossrivertherapy.com/meeting-statistics)
+Research on Meeting Statistics and Data that was incorporated into the project
 
-### Crime Data Sources:
-- [US Government provided data](https://catalog.data.gov/dataset/?tags=crime)  
-Data Points: Date and time of each reported crime incident, Crime type  
 
-- [Los Angeles Crime Data](https://data.lacity.org/Public-Safety/Crime-Data-from-2020-to-Present/2nrs-mtv8/about_data)  
-Data Points: Date and time of each reported crime incident, Crime type | 1004683 rows of data
-
-- [Houston Crime Data](https://www.kaggle.com/datasets/iamkevin/raw-aggregate-houston-crime-report-data)  
-Data Points: Date and time of each reported crime incident, Crime type | 1185476 rows of data 
-
-- [Denver Crime Data](https://www.kaggle.com/code/paulo098/denver-crime-data-analysis-and-prediction)  
-Data Points: Date and time of each reported crime incident, Crime type | 386867 rows of data 
-
-- [Austin Crime Data](https://catalog.data.gov/dataset/crime-reports-bf2b7)  
-Data Points: Date and time of each reported crime incident, Crime type | 2522587 rows of data
-
-### Traffic Data Source
-- [Maryland Traffic Data](https://data.montgomerycountymd.gov/Public-Safety/Traffic-Violations/4mse-ku6q/about_data)
-Data Points: Date and time of each reported traffic violation, Violation type | 1048608 rows of data
 
 ## Team Members:  
-Data Engineer: Sheila Mathews  
-Data Analyst: Raymond Stover  
-Data Scientist: Michael Brady  
-Data Scientist: Zain Master  
+AI Software Engineer/ ML Engineer: Nik Psyllas
+AI Prompt Engineer / Product Manager: Zain Master  
