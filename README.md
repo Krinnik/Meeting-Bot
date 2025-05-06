@@ -110,8 +110,8 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
 
 ```
 - **For Project Files, see:**
-    - /Zain/Zain_meeting_ai_workspace.ipynb
-    - /Nik/meeting_ai_workspace.ipynb
+    - /zain_folder/Zain_meeting_ai_workspace.ipynb
+    - /nik_folder/meeting_ai_workspace.ipynb
 
   
 ## Data Collection 
