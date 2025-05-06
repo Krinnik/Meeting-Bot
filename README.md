@@ -168,7 +168,7 @@ Using the following average Colorado salary scales for team member roles, we wer
 Total Cost Creating App (2 weeks) = $8483.30 
   
 
-## Next Steps:-----------
+## Next Steps:
 The application developed can be used by anyone wanting to better manage, plan, and prioritize their work. While the application is currently usable and can be marketed, we'd still like to:
 - Half the number of calls to OpenAI (Currently 6 calls, need to half that, especially the ones to the more expensive models).
 - Create Calendar events w/ assignments # of days prior to assignment being due.
@@ -178,7 +178,7 @@ The application developed can be used by anyone wanting to better manage, plan, 
 - Hallucinations are inevitible, so we need to continue to find a way to identify / still incorporate users into the loop prior to send.
   - Enhance the user experience for user verification. 
 
-
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Appendix
 ## Data Sources:
 ### Meeting Data Sources:
