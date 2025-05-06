@@ -100,12 +100,14 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
   📦Meeting-Bot 
       ┣ 📂Nik_folder  (Project Notebooks: Summarizer, Action Extractor, Email Developer / Collector and MailAgent)
       ┣ 📂Zain_folder (Project Notebooks: Summarizer, Action Extractor, Evaluator, TaskEstimateBot, Q&A Query)
-      ┣ 📂Resources (Meeting recordings, CommonTasks.csv) 
-      ┣ 📜.utils.py
+      ┣ 📂Resources (Meeting recordings, CommonTasks.csv, sumaction-logo.png, Token_count_compression_ratio.png  ) 
       ┣ 📜.gitignore
       ┣ 📜LICENSE 
-      ┣ 📜README.md 
-      ┗ 📜SumAction.svg
+      ┣ 📜README.md
+      ┣ 📜requirements.txt
+      ┣ 📜sumaction_utils.py
+      ┗ 📜sumaction.py
+
 ```
 - **For Project Files, see:**
     - /Zain/Zain_meeting_ai_workspace.ipynb
