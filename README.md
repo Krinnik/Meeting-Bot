@@ -17,13 +17,13 @@ We leveraged OpenAI, its LLMs, and engineered prompts that were effective in cre
 - [Project Overview](#project-overview)  
   - [Project Requirements](#project-requirements)  
   - [Data Collection](#data-collection)  
-  - [Data Analysis](#data-analysis)
+  - [Expected Outcome](#expected-outcome)
 - [Findings](#conclusion)
-  - [Statistical Significance](#statistical-significance)
+  - [Summarizer Evaluation](#summarizer-evaluation)
   - [Lessons Learned](#lessons-learned)
   - [Next Steps](#next-steps)  
 - [Data Sources](#data-sources) 
-- [Team Mambers](#team-members)
+- [Team Members](#team-members)
 - [Presentation](#presentation)
 
 ## Project Overview  
@@ -124,8 +124,8 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
     - Multiple Meeting notes that were hand written by a human for summarizer evaluation
 
 
-## Data Analysis
-- GOAL: Have the bot properly transcribe meeting notes, create a summary *(high accuracy, precision and recall)*, extract action items, assign a task estimate to them, and lastly send the summary and action items out to relevant users. 
+## Expected Outcome
+- GOAL: Have the our solution properly transcribe meeting notes, create a summary *(high accuracy, precision and recall)*, extract action items, assign a task estimate to them, and lastly send the summary and action items out to relevant users. 
 
 
 ## Visualizations  
@@ -149,26 +149,30 @@ Long story short, SumAction is doing a good enough job to summarize meeting note
 ## Lessons Learned
 ----------
 - Prompt engineering is definitely an art! Just changing single words in the prompt can completely change up the response (eg. Using the work 'Unique').
-- LLMs and bot responses are definitely converging (feel the training datasets for LLMs were quite close).
-- Its getting really easy to build applications that can help increase productivity, but at the expense of what traditionally took some cognitive creative thinking 
+- LLMs and bot responses are definitely converging (feel the training datasets for LLMs were quite close - OpenAI vs. Gemini vs. Anthorpic).
+- Its getting really easy to build applications that can help increase productivity, but this comes at the expense of what traditionally took some cognitive creative thinking
+- A high frequency # of calls to OpenAI can get expensive really quick, especially using the new models.
+- One must explore the langChain chains to and determine the right 'chain' for the agents.
 
 **Cost Of Project**
 Using the following average Colorado salary scales for team member roles, we were able to calculate the cost of conducting this project. 
 
 - Software (1): $109,223 | *(per week cost = $2100.44)*
 - Prompt Manager (1): $110,823 | *(per week cost = $2131.21)*
-- Cost per meeting (OpenAI): $0.35
+- Cost per meeting (OpenAI) transcription (Summary, Action Items, Email): $0.35
+- - Current Budget: $20
 - App Hosting Cost: $500/month 
 
-Total Cost Creating App (2 weeks) = $8463.30 
+Total Cost Creating App (2 weeks) = $8483.30 
   
 
 ## Next Steps:-----------
 The application developed can be used by anyone wanting to better manage, plan, and prioritize their work. While the application is currently usable and can be marketed, we'd still like to:
-- Half the number of calls to OpenAI (2 summarizer + 2 assignment calls)
+- Half the number of calls to OpenAI (Currently 6 calls, need to half that, especially the ones to the more expensive models)
 - Create Calendar events w/ assignments # of days prior to assignment being due
 - Coalesce all events for user and help them understand ALL of their end-of-day assignments
-- Build in prioritization and memory so that user can query system to better plan deliverables for the upcoming work week. 
+- Build in prioritization and memory so that user can query system to better plan deliverables for the upcoming work week.
+- Build integrations with other Task management tools, or virtual meeting services 
 
 
 ## Appendix
