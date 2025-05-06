@@ -100,7 +100,7 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
   📦Meeting-Bot 
       ┣ 📂Nik_folder  (Project Notebooks: Summarizer, Action Extractor, Email Developer / Collector and MailAgent)
       ┣ 📂Zain_folder (Project Notebooks: Summarizer, Action Extractor, Evaluator, TaskEstimateBot, Q&A Query)
-      ┣ 📂Resources (Meeting recordings, CommonTasks.csv, sumaction-logo.png, Token_count_compression_ratio.png  ) 
+      ┣ 📂Resources (Meeting recordings, CommonTasks.csv, sumaction-logo.png, Token_count_compression_ratio.png) 
       ┣ 📜.gitignore
       ┣ 📜LICENSE 
       ┣ 📜README.md
@@ -117,13 +117,13 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
 ## Data Collection 
 - (Also See [Data Sources](#data-sources))  
 1. Public Meetings:  
-    - Initial assessment conducted to understand the data and identify any issues
-        - Read in meetings from the dataset that included full notes and summaries
+    - Initial assessment conducted to understand the data and identify any issues.
+        - Read in meetings from the dataset that included full notes and summaries.
       
 2. Zain's Meeting Notes:
-    - Actual meeting notes (NOT Included in the resources as they were only used for testing the evaluator: Bleu, ROUGE, Tokens)
-    - Additional formatted examples were also include to test the solutions transcribe capabilities (video/ audio > text)
-    - Multiple Meeting notes that were hand written by a human for summarizer evaluation
+    - Actual meeting notes (NOT Included in the resources as they were only used for testing the evaluator: Bleu, ROUGE, Tokens).
+    - Additional formatted examples were also include to test the solutions transcribe capabilities (video/ audio > text).
+    - Multiple Meeting notes that were hand written by a human for summarizer evaluation.
 
 
 ## Expected Outcome
@@ -146,13 +146,13 @@ The methods essentially compare a generated summary against a set of reference s
 
 ***Tokens:*** We also looked at the Token Count / Compression ratios as they reveal how efficiently a summarization model reduces the original text while preserving its meaning. Token count indicates the number of word fragments (tokens) in a piece of text, while compression ratio measures the reduction in token count between the original text and its summary. 
 
-Long story short, SumAction is doing a good enough job to summarize meeting notes and call out learnings. NOTE: We also compared how our models output compared to that of another models output and can see a lot more similarity in recall and precision scoring … which kinda points to that the models are converging closer to each other Or despite being named differently, they had a similar training set
+Long story short, SumAction is doing a good enough job to summarize meeting notes and call out learnings. NOTE: We also compared how our models output compared to that of another models output and can see a lot more similarity in recall and precision scoring … which kinda points to that the models are converging closer to each other Or despite being named differently, they had a similar training set.
 
 ## Lessons Learned
 ----------
 - Prompt engineering is definitely an art! Just changing single words in the prompt can completely change up the response (eg. Using the work 'Unique').
 - LLMs and bot responses are definitely converging (feel the training datasets for LLMs were quite close - OpenAI vs. Gemini vs. Anthorpic).
-- Its getting really easy to build applications that can help increase productivity, but this comes at the expense of what traditionally took some cognitive creative thinking
+- Its getting really easy to build applications that can help increase productivity, but this comes at the expense of what traditionally took some cognitive creative thinking.
 - A high frequency # of calls to OpenAI can get expensive really quick, especially using the new models.
 - One must explore the langChain chains to and determine the right 'chain' for the agents.
 
@@ -170,11 +170,13 @@ Total Cost Creating App (2 weeks) = $8483.30
 
 ## Next Steps:-----------
 The application developed can be used by anyone wanting to better manage, plan, and prioritize their work. While the application is currently usable and can be marketed, we'd still like to:
-- Half the number of calls to OpenAI (Currently 6 calls, need to half that, especially the ones to the more expensive models)
-- Create Calendar events w/ assignments # of days prior to assignment being due
-- Coalesce all events for user and help them understand ALL of their end-of-day assignments
+- Half the number of calls to OpenAI (Currently 6 calls, need to half that, especially the ones to the more expensive models).
+- Create Calendar events w/ assignments # of days prior to assignment being due.
+- Coalesce all events for user and help them understand ALL of their end-of-day assignments.
 - Build in prioritization and memory so that user can query system to better plan deliverables for the upcoming work week.
-- Build integrations with other Task management tools, or virtual meeting services 
+- Build integrations with other Task management tools, or virtual meeting services.
+- Hallucinations are inevitible, so we need to continue to find a way to identify / still incorporate users into the loop prior to send.
+- - Enhance the user experience for user verification. 
 
 
 ## Appendix
@@ -184,7 +186,7 @@ The application developed can be used by anyone wanting to better manage, plan, 
 This corpus contains meetings, made of pairs of (a) automatic transcriptions from audio recordings, (b) meeting reports written by a professional.
 
 - [59+ Meeting statistics](https://www.crossrivertherapy.com/meeting-statistics)
-Research on Meeting Statistics and Data that was incorporated into the project
+Research on Meeting Statistics and Data that was incorporated into the project.
 
 
 
