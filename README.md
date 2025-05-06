@@ -162,7 +162,7 @@ Using the following average Colorado salary scales for team member roles, we wer
 - Software (1): $109,223 | *(per week cost = $2100.44)*
 - Prompt Manager (1): $110,823 | *(per week cost = $2131.21)*
 - Cost per meeting (OpenAI) transcription (Summary, Action Items, Email): $0.35
-- - Current Budget: $20
+  - Current Budget: $20
 - App Hosting Cost: $500/month 
 
 Total Cost Creating App (2 weeks) = $8483.30 
@@ -176,7 +176,7 @@ The application developed can be used by anyone wanting to better manage, plan, 
 - Build in prioritization and memory so that user can query system to better plan deliverables for the upcoming work week.
 - Build integrations with other Task management tools, or virtual meeting services.
 - Hallucinations are inevitible, so we need to continue to find a way to identify / still incorporate users into the loop prior to send.
-- - Enhance the user experience for user verification. 
+  - Enhance the user experience for user verification. 
 
 
 ## Appendix
