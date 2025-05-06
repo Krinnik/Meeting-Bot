@@ -131,7 +131,7 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
 ## Visualizations  
 
 - Plot of Token Count/ Compression Ratio,
-![Token_plot](Resources/Token Count_Compression Ratio.png)
+![Token_plot](Resources/Token_Count_Compressio_Ratio.png)
  
 
 ## Summarizer Evaluation: 
