@@ -31,6 +31,13 @@ We Americans love our meetings! We often find ourselves spending a significant p
 
 Our team is developing an innovative solution that leverages the power of Large Language Models (LLMs) and intelligent bots to dramatically increase meeting productivity. We aim to address these challenges by creating a suite of tools that automate critical meeting-related tasks, allowing professionals to focus on higher-value activities. 
 
+<h1 align = "left" > SumAction </h1>
+<h3 align = "left" > Plan your week and get ahead of everyone! </h3>
+<p align = "left" >
+    <img title="SumAction" img src = "Resources/SumAction_App.png" alt = "SumAction" width = "600"/>
+    </p>
+
+
 Our solution offers the following key features:
 1. **Automated Summarization:** Our bot automatically generates concise and accurate summaries of meeting discussions, capturing key points and decisions. This eliminates the need for manual note-taking and ensures that all participants have a clear record of what was discussed.
 
@@ -63,6 +70,11 @@ Our solution offers the following key features:
     1. ***Onboard New Team Members:*** Quickly bring new team members up to speed by providing them with easy access to past meeting discussions.
 
 
+  <h3 align = "left" > Scan Below to access the SumAction Meeting Transcription App </h3>
+  <p align = "left" >
+  <img title="MaxiMile App" img src = "Resources/SumAction_QR.png" alt = "SumAction App" width = "150"/>
+    </p>
+    
 By automating these time-consuming and often tedious tasks, our AI-powered meeting bot empowers professionals to reclaim valuable time, reduce stress, and focus on the substantive aspects of their work.
 
 ## Project Requirements
@@ -74,15 +86,15 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
   - GitHub account   
   - Load Dependancies: 
     ```
-   streamlit
-   pandas
-   langchain
-   langchain-openai
-   langchain-community
-   openai
-   sentence-transformers
-   faiss-cpu
-   rapidfuzz
+    streamlit
+    pandas
+    langchain
+    langchain-openai
+    langchain-community
+    openai
+    sentence-transformers
+    faiss-cpu
+    rapidfuzz
     ```
 - **GitHub Repository Structure:**
 ``` Markdown for Clean display of GitHub Repository Structure
@@ -181,4 +193,5 @@ Research on Meeting Statistics and Data that was incorporated into the project.
 
 ## Team Members:  
 AI Software Engineer/ ML Engineer: Nik Psyllas
+
 AI Prompt Engineer / Product Manager: Zain Master  
