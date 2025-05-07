@@ -74,26 +74,15 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
   - GitHub account   
   - Load Dependancies: 
     ```
-    from langchain_openai import ChatOpenAI
-    from dotenv import load_dotenv
-    import os
-    from langchain.agents import initialize_agent, load_tools
-    from langchain.chains.llm import LLMChain
-    from langchain_core.prompts import ChatPromptTemplate
-    from langchain.docstore.document import Document
-    from langchain.chains.summarize import load_summarize_chain
-    from langchain_core.prompts import PromptTemplate
-    import pandas as pd
-    from datasets import load_dataset
-    from openai import OpenAI
-    from rouge import Rouge
-    from rouge_score import rouge_scorer
-    from pprint import pprint
-    import nltk
-    import evaluate
-    import tiktoken
-    from transformers import pipeline
-    import matplotlib.pyplot as plt
+   streamlit
+   pandas
+   langchain
+   langchain-openai
+   langchain-community
+   openai
+   sentence-transformers
+   faiss-cpu
+   rapidfuzz
     ```
 - **GitHub Repository Structure:**
 ``` Markdown for Clean display of GitHub Repository Structure
