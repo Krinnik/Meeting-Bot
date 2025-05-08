@@ -24,7 +24,7 @@ We leveraged OpenAI, its LLMs, and engineered prompts that were effective in cre
   - [Next Steps](#next-steps)  
 - [Data Sources](#data-sources) 
 - [Team Members](#team-members)
-- [Presentation](#presentation)
+- [Presentation](https://docs.google.com/presentation/d/1AzPwQFdch-ddu_zMHq6gZLve8eZgW3cTcu9Ity84A0Y/edit?slide=id.g3535ae97fff_0_1007#slide=id.g3535ae97fff_0_1007)
 
 ## Project Overview  
 We Americans love our meetings! We often find ourselves spending a significant portion of our waking hours in back-to-back meetings. Research indicates that professionals spend an average of 20-25 hours every week in meetings. Furthermore, individuals spend an additional 30-45 minutes on post-meeting activities, including compiling notes, action items, and follow-up tasks. This becomes even more challenging in today's fast-paced work environment, where many of us transition seamlessly from one meeting to the next. The constant context switching and information overload can lead to decreased productivity, increased stress, and a struggle to effectively manage workloads.
