@@ -136,7 +136,9 @@ Use the single line to run the command within the Jyupter Notebook | [!pip insta
 - Plot of Token Count/ Compression Ratio,
 ![Token_plot](Resources/Token_Count_Compressio_Ratio.png)
  
-
+- SumActions LLM Recipe
+![LLM Recipe](Resources/the_recipe.png)
+  
 ## Summarizer Evaluation: 
 We wanted to ensure that SumAction’s summarizer was up to the task. While the prompts get all the spotlight, as we know the outputs are generated based on the level of detail and clarity provided, we wanted to evaluate how good our summary was. Measuring the performance of text generation tasks like summarization or translation is not as straightforward. Applying some sort of exact match between the generated summary and the label is not a good solution — even humans would fare poorly under such a metric, because we all have our own writing style. One of the most commonly used metrics for summarization is the **ROUGE score** *(short for Recall-Oriented Understudy for Gisting Evaluation)* or **BLEU** *(bilingual evaluation understudy)*.
 
