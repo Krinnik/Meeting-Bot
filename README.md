@@ -183,12 +183,14 @@ The application developed can be used by anyone wanting to better manage, plan, 
 ## Appendix
 ## Data Sources:
 ### Meeting Data Sources:
-- [Public Meetings](https://github.com/pltrdy/public_meetings)
+- [Public Meetings](https://github.com/pltrdy/public_meetings):
 This corpus contains meetings, made of pairs of (a) automatic transcriptions from audio recordings, (b) meeting reports written by a professional.
 
-- [59+ Meeting statistics](https://www.crossrivertherapy.com/meeting-statistics)
+- [59+ Meeting statistics](https://www.crossrivertherapy.com/meeting-statistics):
 Research on Meeting Statistics and Data that was incorporated into the project.
 
+- [SumAction Project Presentation](https://docs.google.com/presentation/d/1AzPwQFdch-ddu_zMHq6gZLve8eZgW3cTcu9Ity84A0Y/edit?usp=sharing):
+Presentation our products capabilities and next steps.
 
 
 ## Team Members:  
